@@ -1,12 +1,22 @@
 {
-  description = "Homelab NixOS Flake";
-
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
     # Disko
     disko.url = "github:nix-community/disko";
     disko.inputs.nixpkgs.follows = "nixpkgs";
   };
+
+
+  #outputs = { nixpkgs, disko, ... }:
+  #  {
+  #    nixosConfigurations.hetzner-cloud = nixpkgs.lib.nixosSystem {
+  #      system = "x86_64-linux";
+  #      modules = [
+  #        disko.nixosModules.disko
+  #        ./configuration.nix
+  #      ];
+  #    };
+  #  };
 
   outputs = { self, nixpkgs, disko, ... }@inputs: let
     nodes = [
@@ -25,8 +35,6 @@
           modules = [
               # Modules
 	            disko.nixosModules.disko
-	            ./hardware-configuration.nix
-	            ./disko-config.nix
 	            ./configuration.nix
 	          ];
         };

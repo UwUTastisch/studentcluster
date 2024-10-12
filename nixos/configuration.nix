@@ -1,13 +1,20 @@
-# Edit this configuration file to define what should be installed on
-# your system. Help is available in the configuration.nix(5) man page, on
-# https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
+{ modulesPath, config, lib, pkgs, meta, ... }: {
+  imports = [
+    (modulesPath + "/installer/scan/not-detected.nix")
+    (modulesPath + "/profiles/qemu-guest.nix")
+    ./disk-config.nix
+  ];
 
-{ config, lib, pkgs, meta, ... }:
+  boot.loader.grub = {
+    # no need to set devices, disko will add all devices that have a EF02 partition to the list already
+    # devices = [ ];
+    efiSupport = true;
+    efiInstallAsRemovable = true;
+  };
+  services.openssh.enable = true;
 
-{
-  imports =
-    [ # Include the results of the hardware scan.
-    ];
+  # Set your time zone.
+  time.timeZone = "Germany/Berlin";
 
   nix = {
     package = pkgs.nixFlakes;
@@ -16,23 +23,13 @@
     '';
   };
 
-  # Use the systemd-boot EFI boot loader.
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
-
-  networking.hostName = meta.hostname; # Define your hostname.
-  # Pick only one of the below networking options.
-  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
-  networking.networkmanager.enable = true;  # Easiest to use and most distros use this by default.
-
-  # Set your time zone.
-  time.timeZone = "America/Chicago";
-
-  # Configure network proxy if necessary
-  # networking.proxy.default = "http://user:password@proxy:port/";
-  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
-
-  # Select internationalisation properties.
+  environment.systemPackages = with pkgs; [
+     neovim
+     k3s
+     cifs-utils
+     nfs-utils
+     git
+  ];
   i18n.defaultLocale = "en_US.UTF-8";
   console = {
     font = "Lat2-Terminus16";
@@ -55,7 +52,8 @@
   services.k3s = {
     enable = true;
     role = "server";
-    tokenFile = /var/lib/rancher/k3s/server/token;
+    # token = "" # hardcoded token that will manually set on setup
+    # tokenFile = /var/lib/rancher/k3s/server/token; # file where the token is stored in life system for updating purpose
     extraFlags = toString ([
 	    "--write-kubeconfig-mode \"0644\""
 	    "--cluster-init"
@@ -73,80 +71,26 @@
     name = "iqn.2016-04.com.open-iscsi:${meta.hostname}";
   };
 
-  # Enable CUPS to print documents.
-  # services.printing.enable = true;
+  networking.hostName = meta.hostname;
+  networking.firewall.enable = false;
 
-  # Enable sound.
-  # sound.enable = true;
-  # hardware.pulseaudio.enable = true;
+  users.users.root.openssh.authorizedKeys.keys = [
+    # change this to your ssh key
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKgEbYFhjx2OJ9c4XxFLBJB7nZylIXEKgNcU+kA7huaZ user@Designare-AMD-NVIDIA-INTEL"    
+  ];
 
-  # Enable touchpad support (enabled default in most desktopManager).
-  # services.xserver.libinput.enable = true;
-
-  # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.elliott = {
+  users.users.uwutastisch = {
     isNormalUser = true;
     extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
     packages = with pkgs; [
       tree
     ];
-    # Created using mkpasswd
-    hashedPassword = "$6$026yeBrVd8/z.7CJ$e9Fl5oMabKXM6fRC0V7kG/LCZnCyunekKLY4T3Vi/zQXV7PpOcTchDpxr0opnI3zA4.2V9yyu51h1tF.4UoHT1";
+    # Created using mkpasswd -m sha-512
+    hashedPassword = "$6$d816QdheQ3hVToWr$p3A/vNJicvTISWyIv4LRK7/wNFsB7eLmvARRNVJSH8y9s/F0l/239HWLlj1nXJRC2aIMqa0f3XzBe3QnD8TCZ1";
     openssh.authorizedKeys.keys = [
-      "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDNFZUZg93LySz/1Qdg7WBEBdpnSMjJyJmFwnPikmTHJ/MQWC0Bf5kVyfkLxaU3paeRQnoI4RcG9k8DJGy8hnUdxe2Eg5fWtW0+cJ0zm791WisCTb8bCmTBO9053U59qOA7WTrJAVcTylBsBa7R3CGs6FYlMsu8CXvUWrp4XQ2k83DQlzpgr5r9BNIsfbfswXMSm91i/bRSuxSXu2QpV/9C4wHBUYAGz+hTFw8LJgt/lH6ute2w1ed93/vG4CNI9gv1obecc8rrVGvjZk1Q6sPr8PamBxc7Y4HEYWKPtJPq54UK+b2duUuL2tDYVQmJIvto6how+EZ/oAPxMRK5qHJOn2AJ/z0rcPO6FqyggtKeZATOgFCYSNLLrEwiYvppVNiM/hjFRqpk+BZ+gWE1X+D3xXIDUG1jchMCUQ/2q62CSp/VU/z39IGBxa9eN/k6WsmdlKgeCcx2BtoFKMd0LQqfndduYPcnvn2EzJwLrF0p7LQGIO74jkAQ451IeSoDOvlCe9Y9LAjwH1DG4ve7XwuqpKdJ2LcHirLHxQIONdc906U70TVuQzGOJed5huhKBkbGzDi08VsF8zCO9pMHSJ2ioBWVyNSRUf9wVKtPtUFhmgCHT/l0+xdrCeE8m7sT0Zb8qNjdMDylXQhaPm30f/ievIBe5+81w0Kyoj4kFSzr3Q== cardno:11_070_772"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKgEbYFhjx2OJ9c4XxFLBJB7nZylIXEKgNcU+kA7huaZ user@Designare-AMD-NVIDIA-INTEL"
     ];
   };
 
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
-  environment.systemPackages = with pkgs; [
-     neovim
-     k3s
-     cifs-utils
-     nfs-utils
-     git
-  ];
-
-  # Some programs need SUID wrappers, can be configured further or are
-  # started in user sessions.
-  # programs.mtr.enable = true;
-  # programs.gnupg.agent = {
-  #   enable = true;
-  #   enableSSHSupport = true;
-  # };
-
-  # List services that you want to enable:
-
-  # Enable the OpenSSH daemon.
-  services.openssh.enable = true;
-
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ 80 ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  networking.firewall.enable = false;
-
-  # Copy the NixOS configuration file and link it from the resulting system
-  # (/run/current-system/configuration.nix). This is useful in case you
-  # accidentally delete configuration.nix.
-  # system.copySystemConfiguration = true;
-
-  # This option defines the first version of NixOS you have installed on this particular machine,
-  # and is used to maintain compatibility with application data (e.g. databases) created on older NixOS versions.
-  #
-  # Most users should NEVER change this value after the initial install, for any reason,
-  # even if you've upgraded your system to a new NixOS release.
-  #
-  # This value does NOT affect the Nixpkgs version your packages and OS are pulled from,
-  # so changing it will NOT upgrade your system.
-  #
-  # This value being lower than the current NixOS release does NOT mean your system is
-  # out of date, out of support, or vulnerable.
-  #
-  # Do NOT change this value unless you have manually inspected all the changes it would make to your configuration,
-  # and migrated your data accordingly.
-  #
-  # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
-  system.stateVersion = "23.11"; # Did you read the comment?
-
+  system.stateVersion = "24.05";
 }
