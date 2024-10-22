@@ -60,10 +60,10 @@
 	    "--disable servicelb"
 	    "--disable traefik"
 	    "--disable local-storage"
-    ] ++ (if meta.hostname == "homelab-0" then [] else [
-	      "--server https://homelab-0:6443"
+    ] ++ (if meta.hostname == "studentcluster-1" then [] else [
+	      "--server https://studentcluster-1:6443"
     ]));
-    clusterInit = (meta.hostname == "homelab-0");
+    clusterInit = (meta.hostname == "studentcluster-1");
   };
 
   services.openiscsi = {
@@ -76,10 +76,14 @@
 
   users.users.root.openssh.authorizedKeys.keys = [
     # change this to your ssh key
+
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKgEbYFhjx2OJ9c4XxFLBJB7nZylIXEKgNcU+kA7huaZ user@Designare-AMD-NVIDIA-INTEL"    
+    "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC7uTj/p9ZTQn1tJJxQVYc5qjL3zflQ6lAHJwl+Uc+3bA2St7E9ex0qMxqJVkyW9r/vn4QJ7KjnJ6AqaWICMKoqaUmRGtGDl+Al/ZL6MmTD4769mP/W2Jl//LS5GVFeZ0ob6Un960cwFP6QAs6x9uEoXMMqJMIbVLZ25KWzrt16UJO59H4USykVibs6M3cZwgqAu2mbpBD4G31sfT6/3v5Q0YE80R/aM+WcOwJxSAaFNWLosV0ZW8l4O97KOQLR+t+XUk5wESjcs667YOMirCfjlr6dfP81QMLjJzlj3AGEf460c0rbJjgiWhdDMk9fnKVaX7gjnxhssAKRLy+dE+VKVeRUfeX9Rw5BGYseCJ6qiqAFBx+lwn08j7lcnP58sTHfWoXAFBAEdtKc5S/R/RqS12jl+8TR0gQzwWbI7OwkZrNBd0aWv5ICiXIf68IDBUJPA4pIbSL7YXOMfKrvMGIoWu1PALvki6fiE1au9/3Hhg1MjT8Hd7ltoizoTMwG5Ck= vz2269@honshu"
+    # temp4 pw
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOvAWkHAUnxepkimZE+8gDwkDbL7XjUyDXWhmoF7lPlJ nixos@nixos"
   ];
 
-  users.users.uwutastisch = {
+  users.users.admin = {
     isNormalUser = true;
     extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
     packages = with pkgs; [
@@ -89,6 +93,9 @@
     hashedPassword = "$6$d816QdheQ3hVToWr$p3A/vNJicvTISWyIv4LRK7/wNFsB7eLmvARRNVJSH8y9s/F0l/239HWLlj1nXJRC2aIMqa0f3XzBe3QnD8TCZ1";
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKgEbYFhjx2OJ9c4XxFLBJB7nZylIXEKgNcU+kA7huaZ user@Designare-AMD-NVIDIA-INTEL"
+      "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC7uTj/p9ZTQn1tJJxQVYc5qjL3zflQ6lAHJwl+Uc+3bA2St7E9ex0qMxqJVkyW9r/vn4QJ7KjnJ6AqaWICMKoqaUmRGtGDl+Al/ZL6MmTD4769mP/W2Jl//LS5GVFeZ0ob6Un960cwFP6QAs6x9uEoXMMqJMIbVLZ25KWzrt16UJO59H4USykVibs6M3cZwgqAu2mbpBD4G31sfT6/3v5Q0YE80R/aM+WcOwJxSAaFNWLosV0ZW8l4O97KOQLR+t+XUk5wESjcs667YOMirCfjlr6dfP81QMLjJzlj3AGEf460c0rbJjgiWhdDMk9fnKVaX7gjnxhssAKRLy+dE+VKVeRUfeX9Rw5BGYseCJ6qiqAFBx+lwn08j7lcnP58sTHfWoXAFBAEdtKc5S/R/RqS12jl+8TR0gQzwWbI7OwkZrNBd0aWv5ICiXIf68IDBUJPA4pIbSL7YXOMfKrvMGIoWu1PALvki6fiE1au9/3Hhg1MjT8Hd7ltoizoTMwG5Ck= vz2269@honshu"
+      # temp4 pw
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOvAWkHAUnxepkimZE+8gDwkDbL7XjUyDXWhmoF7lPlJ nixos@nixos"
     ];
   };
 
