@@ -1,17 +1,5 @@
 hub:
   config:
-    JupyterHub:
-      authenticator_class: ldapauthenticator.LDAPAuthenticator
-    LDAPAuthenticator:
-      server_address: ldap.uni-rostock.de
-      server_port: 636
-      use_ssl: True
-      bind_dn_template:
-        - uid={username},ou=people,o=uni-rostock,c=de
-      user_search_base: ou=people,o=uni-rostock,c=de
-      user_attribute: uid
-      escape_userdn: false
-      lookup_dn: false
     Authenticator:
       admin_users:
         - uwutastisch
