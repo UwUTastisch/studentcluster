@@ -107,7 +107,7 @@ Now, `secrets.yaml` is encrypted and safe to commit to your repository.
 bash
 ```shell
 sudo nix run github:nix-community/nixos-anywhere -- --flake .#studentcluster-1 \
-  --extra-files ~/.config/sops/age/keys.txt:/etc/age/keys.txt \
+  --extra-files  \
   root@nixos-installer
 ```
 
