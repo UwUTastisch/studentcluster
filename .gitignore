@@ -5,3 +5,4 @@ nixos/facter.json
 **/keys.txt
 **/age-key.txt
 **/age/private.txt
+facter.json
