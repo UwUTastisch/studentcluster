@@ -36,7 +36,13 @@ The command I use is as follows:
 ```shell
 nix run github:nix-community/nixos-anywhere \
 --extra-experimental-features "nix-command flakes" \
--- --flake '.#studentcluster-1' nixos@temp1.informatik.uni-rostock.de
+-- --flake '.#studentcluster-1' --generate-hardware-config nixos-facter facter.json <user>@<hostname>
+```
+
+or 
+
+```shell
+nix run github:nix-community/nixos-anywhere -- --generate-hardware-config nixos-facter ./facter.json  --flake '.#studentcluster-1' root@nixos-installer
 ```
 
 make sure to replace with your own ip.
