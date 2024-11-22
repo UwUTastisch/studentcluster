@@ -1,9 +1,4 @@
 { modulesPath, config, lib, pkgs, meta, ... }: {
-  imports = [
-    (modulesPath + "/installer/scan/not-detected.nix")
-    (modulesPath + "/profiles/qemu-guest.nix")
-    ./disk-config.nix
-  ];
 
   boot.loader.grub = {
     # no need to set devices, disko will add all devices that have a EF02 partition to the list already
@@ -52,8 +47,8 @@
   services.k3s = {
     enable = true;
     role = "server";
-    # token = "" # hardcoded token that will manually set on setup
-    # tokenFile = /var/lib/rancher/k3s/server/token; # file where the token is stored in life system for updating purpose
+    token = keys.k3sToken; # hardcoded token that will manually set on setup
+    # tokenFile = config.sops.secrets.token.path; #/var/lib/rancher/k3s/server/token; # file where the token is stored in life system for updating purpose
     extraFlags = toString ([
 	    "--write-kubeconfig-mode \"0644\""
 	    "--cluster-init"

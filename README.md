@@ -45,6 +45,10 @@ or
 nix run github:nix-community/nixos-anywhere -- --generate-hardware-config nixos-facter ./facter.json  --flake '.#studentcluster-1' root@nixos-installer
 ```
 
+```shell
+nix run github:nix-community/nixos-anywhere --extra-experimental-features "nix-command flakes" -- --flake .#studentcluster-1 --generate-hardware-config nixos-facter facter.json nixos@temp2.informatik.uni-rostock.de
+```
+
 make sure to replace with your own ip.
 
 ## helm
