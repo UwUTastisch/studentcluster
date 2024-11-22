@@ -1,2 +1,7 @@
 env
 nixos/facter.json
+# .gitignore
+# Ignore the Age private key
+**/keys.txt
+**/age-key.txt
+**/age/private.txt

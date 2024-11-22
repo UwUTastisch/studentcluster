@@ -1,4 +1,23 @@
-{ modulesPath, config, lib, pkgs, meta, ... }: {
+{ config, pkgs, lib, meta, inputs, ... }:
+
+{
+  imports = [
+    inputs.sops-nix.nixosModules.sops
+  ];
+
+# Tell sops-nix where to find the Age private key
+  sops.age.keyFile = "/etc/age/keys.txt";
+  
+  sops.defaultSopsFile = "${inputs.self}/secrets.yaml";
+
+  sops.secrets = {
+    k3sToken = {
+      key = "k3sToken";
+      owner = "root";
+      group = "root";
+      mode = "0400";
+    };
+  };
 
   boot.loader.grub = {
     # no need to set devices, disko will add all devices that have a EF02 partition to the list already
@@ -47,7 +66,8 @@
   services.k3s = {
     enable = true;
     role = "server";
-    token = keys.k3sToken; # hardcoded token that will manually set on setup
+    tokenFile = config.sops.secrets.k3sToken.path;
+    # token = keys.k3sToken; # hardcoded token that will manually set on setup
     # tokenFile = config.sops.secrets.token.path; #/var/lib/rancher/k3s/server/token; # file where the token is stored in life system for updating purpose
     extraFlags = toString ([
 	    "--write-kubeconfig-mode \"0644\""

@@ -1,0 +1,3 @@
+creation_rules:
+  - encrypted_regex: '^(secrets\.ya?ml)$'
+    age: age124a460zm9hfc2q0aj9twxv8eu96twhl6wl6y74p842ta5tyj7afqucsml2
