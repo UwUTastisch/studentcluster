@@ -1,0 +1,1 @@
+I recommend using ```pwgen -s -n 32 | head -n1```

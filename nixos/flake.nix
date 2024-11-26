@@ -4,11 +4,9 @@
     disko.url = "github:nix-community/disko";
     disko.inputs.nixpkgs.follows = "nixpkgs";
     nixos-facter-modules.url = "github:numtide/nixos-facter-modules";
-    sops-nix.url = "github:Mic92/sops-nix";
-    sops-nix.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, disko, nixos-facter-modules, sops-nix, ... }@inputs:
+  outputs = { self, nixpkgs, disko, nixos-facter-modules, ... }@inputs:
   let
     nodes = [
       "studentcluster-1"
@@ -36,7 +34,6 @@
               else
                 throw "Have you forgotten to run nixos-anywhere with `--generate-hardware-config nixos-facter ./facter.json`?";
           }
-          sops-nix.nixosModules.sops
         ];
       };
     }) nodes);

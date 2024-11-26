@@ -5,3 +5,6 @@ env
 **/keys.txt
 **/age-key.txt
 **/age/private.txt
+**/.root/
+nixos/.root/
+nixos/.root/*

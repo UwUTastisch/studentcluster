@@ -13,11 +13,24 @@ To use this, you'll need the following installed on your sysetm
 - helmfile
 - helm
 - git
-- sops (nix-sops)
 
-Additionally, you'll also want to make changes to the user information found in the `nixos/configuration.nix`
+## Setup
 
-nix-env -iA nixpkgs.sops
+Additionally, you'll also want to make changes to the user information found in the `nixos/configuration.nix`. And you need to init `nixos/.root` with 
+
+```bash 
+cd nixos
+cp example_root -r .root
+```
+
+and setup the a k3s-token
+
+```bash
+# Be careful, this will overwrite the tokenfile
+pwgen -s -n 32 | head -n1 > ./.root/var/lib/rancher/k3s/server/token
+# or use
+cat /dev/urandom | tr -dc 'A-Za-z0-9' | head -c 32 > ./.root/var/lib/rancher/k3s/server/token
+```
 
 
 ## nixos
@@ -35,99 +48,28 @@ studentcluster-3
 
 To set up a node from fresh, you can use [nixos-anywhere](https://github.com/nix-community/nixos-anywhere). This requires loading the nixos installer and then booting the node into it. You can then install remotely once you've set the nodes password using the `passwd` command. 
 
+
 The command I use is as follows:
 
-
-```
-sops --encrypt --in-place secrets.yaml
-```
-
-You're absolutely right, and I apologize for suggesting that. Including private keys or any secrets in your repository is a security risk and defeats the purpose of encryption. Let's explore how you can use `sops-nix` to manage secrets securely without committing private keys to your repository, while also making it easy to deploy to your machines.
-
 ---
-
-### **Secure Secret Management with `sops-nix` Without Committing Private Keys**
-
-To achieve secure secret management without including private keys in your repository, we'll use `sops-nix` with Age keys and ensure that the private key is available on the deployment machine without being stored in the repository.
-
-Here's how you can do it:
-
-1. **Generate an Age Key Pair**
-2. **Encrypt your secrets with `sops`**
-3. **Configure `sops-nix` to use the Age key during deployment**
-4. **Deploy your configuration while securely providing the Age private key**
-
----
-
-### **Step-by-Step Guide**
-
-#### **1. Generate an Age Key Pair**
-
-Generate an Age key pair on your local machine:
-
-```bash
-age-keygen -o ~/.config/sops/age/keys.txt
-```
-
-This command generates a private key and saves it to `~/.config/sops/age/keys.txt`. The public key is included as a comment in the same file.
-
-**Extract the Public Key:**
-
-```bash
-grep "# public key: " ~/.config/sops/age/keys.txt | cut -d' ' -f4
-```
-
-Copy the public key output for use in the next step.
-
-#### **2. Encrypt Your Secrets with `sops`**
-
-Create your `secrets.yaml` file with the sensitive data:
-
-```yaml
-k3sToken: "your-secret-token-here"
-```
-
-Create a `.sops.yaml` configuration file in your project directory (this file can be committed to your repository as it only contains public information):
-
-```yaml
-creation_rules:
-  - encrypted_regex: '^(secrets\.ya?ml)$'
-    age: [ "your-age-public-key-here" ]
-```
-
-Replace `"your-age-public-key-here"` with the Age public key you extracted earlier.
-
-**Encrypt the `secrets.yaml` file:**
-
-```bash
-sops --encrypt --in-place secrets.yaml
-```
-
-Now, `secrets.yaml` is encrypted and safe to commit to your repository.
-bash
-```shell
-sudo nix run github:nix-community/nixos-anywhere -- --flake .#studentcluster-1 \
-  --extra-files  \
-  root@nixos-installer
-```
 
 
 ```bash
 nix run github:nix-community/nixos-anywhere \
 --extra-experimental-features "nix-command flakes" \
 -- --flake '.#studentcluster-1' \
---extra-files ~/.config/sops/age/keys.txt:/etc/age/keys.txt \
+--extra-files './.root'
 --generate-hardware-config nixos-facter facter.json root@nixos-installer
 ```
 
 or 
 
 ```bash
-nix run github:nix-community/nixos-anywhere -- --generate-hardware-config nixos-facter ./facter.json  --flake '.#studentcluster-1' root@nixos-installer
-```
+sudo nix shell github:nix-community/nixos-anywhere -c bash
 
-```shell
-nix run github:nix-community/nixos-anywhere --extra-experimental-features "nix-command flakes" -- --flake .#studentcluster-1 --generate-hardware-config nixos-facter facter.json nixos@temp2.informatik.uni-rostock.de
+sudo nixos-anywhere --flake '.#studentcluster-1' \
+--extra-files './.root'
+--generate-hardware-config nixos-facter facter.json root@nixos-installer
 ```
 
 make sure to replace with your own ip.
