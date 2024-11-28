@@ -53,6 +53,14 @@ The command I use is as follows:
 
 ---
 
+```bash
+# this should have worked with adding the --build-on-remote as nixos-anywhere argument, but it did'nt work on my machine .
+# scp -r .root  root@nixos-installer:
+
+# using this workaround worked on my machine 
+sudo ln -s .root/var/lib/rancher/k3s/server/token /var/lib/rancher/k3s/server/
+```
+than
 
 ```bash
 nix run github:nix-community/nixos-anywhere \
@@ -68,8 +76,9 @@ or
 sudo nix shell github:nix-community/nixos-anywhere -c bash
 
 sudo nixos-anywhere --flake '.#studentcluster-1' \
---extra-files './.root'
---generate-hardware-config nixos-facter facter.json root@nixos-installer
+--extra-files './.root' \
+--generate-hardware-config nixos-facter facter.json \
+root@nixos-installer
 ```
 
 make sure to replace with your own ip.
