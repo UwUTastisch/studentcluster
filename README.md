@@ -34,7 +34,7 @@ To set up a node from fresh, you can use [nixos-anywhere](https://github.com/nix
 The command I use is as follows:
 
 ```shell
-nix run github:nix-community/nixos-anywhere \
+nix run "github:nix-community/nixos-anywhere?ref=1.5.0" \
 --extra-experimental-features "nix-command flakes" \
 -- --flake '.#homelab-0' nixos@192.168.1.100
 ```
