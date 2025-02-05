@@ -1,17 +1,32 @@
 hub:
   config:
+    Authenticator:
+      allow_all: true
+      admin_users:
+        - vz2269
+        - cy2294
+        - mgbckr
+#      enable_auth_state: True
+#      allowed_users:
+#        - vz2269
+#        - uwutastisch
     JupyterHub:
       authenticator_class: ldapauthenticator.LDAPAuthenticator
+      log_level: DEBUG  # Enable debug logging
     LDAPAuthenticator:
       server_address: ldap.uni-rostock.de
-      server_port: 636
-      use_ssl: True
+      #server_port: 636
+      #tls_strategy: "on_connect"  # Updated from use_ssl
       bind_dn_template:
         - uid={username},ou=people,o=uni-rostock,c=de
-      user_search_base: ou=people,o=uni-rostock,c=de
-      user_attribute: uid
-      escape_userdn: false
-      lookup_dn: false
-    Authenticator:
-      admin_users:
-        - uwutastisch
+      #user_search_base: ou=people,o=uni-rostock,c=de
+      #user_attribute: uid
+      #escape_userdn: false
+      #lookup_dn: false
+#      allowed_groups: []
+#      tls_kwargs:
+#        ca_certs_file: /path/to/ca-certificates.crt
+#[W 2025-01-14 15:28:34.352 JupyterHub auth:185] No allow config found, it's possible that nobody can login to your Hub!
+#    You can set `c.Authenticator.allow_all = True` to allow any user who can login to access the Hub,
+#    or e.g. `allowed_users` to a set of users who should have access.
+#    You may suppress this warning by setting c.Authenticator.any_allow_config = True.
