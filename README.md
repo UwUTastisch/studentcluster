@@ -99,3 +99,36 @@ helmfile apply
 Kustomize allows you to manage multiple manifest files in a `Kustomize.yaml`, which also allows you to override values if you need to.
 
 I don't use Kustomize that much in the video, but it's a tool I do often use and is available in `kubectl`.
+
+
+## update nixos system
+
+``` bash
+ssh root@studentcluster-1
+```
+
+pull Repo
+``` bash
+$ git clone https://github.com/UwUTastisch/studentcluster.git
+$ cd studentcluster
+# checkout the right branch,
+$ git checkout uni-cluster
+
+$ cd nixos
+```
+
+create facter if not existent
+``` bash
+$ sudo nix run \
+  --option experimental-features "nix-command flakes" \
+  --option extra-substituters https://numtide.cachix.org \
+  --option extra-trusted-public-keys numtide.cachix.org-1:2ps1kLBUWjxIneOy1Ik6cQjb41X0iXVXeHigGmycPPE= \
+  github:numtide/nixos-facter -- -o facter.json
+# add file to git that nix flake find the file
+git add -f facter.json
+```
+
+udpate the system
+```bash
+$ nixos-rebuild switch --flake .#studentcluster-3
+```
